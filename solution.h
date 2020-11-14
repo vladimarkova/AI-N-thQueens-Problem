@@ -48,12 +48,35 @@ void rowCsInit()
 void d1CsInit()
 {
     int d1Size = 2 * size - 1;
+
     for (int i = 0; i < d1Size; i++)
     {
-        int diff = i - size + 1; // x - y = index - size +1
         d1[i] = 0;
     }
+
+    // index = x - y + size - 1    
+    for (int col = 0; col < size; col++)
+    {
+        d1[d1Code(col, queens[col])]++;
+    }
 }
+
+void d2CsInit()
+{
+    int d2Size = 2 * size - 1;
+
+    for (int i = 0; i < d2Size; i++)
+    {
+        d2[i] = 0;
+    }
+
+    // index = x + y   
+    for (int col = 0; col < size; col++)
+    {
+        d2[d2Code(col, queens[col])]++;
+    }
+}
+
 /* #endregion */
 
 /* #region ClassSolution */
@@ -77,6 +100,7 @@ public:
 
     /* #region CurrentConflicts */
     // x stands for col, y for row
+    // +1, if we have no queen?
     int getCurrentConflicts(int x, int y)
     {
         int conflicts = 0;
@@ -87,6 +111,16 @@ public:
         return conflicts;
     }
 
+    int getPotentionalConflicts(int x, int y)
+    {
+        int conflicts = 0;
+        int index1 = d1Code(x, y);
+        int index2 = d1Code(x, y);
+        conflicts += r[y] + d1[index1] + d2[index2];
+
+        return conflicts;
+    }
+    
     /* #endregion */
 
     /* #region RowOfMinCoflicts */
@@ -142,6 +176,9 @@ public:
     void init()
     {
         queens[0] = rand() % size;
+        r[queens[0]]++;
+        d1[d1Code(0, queens[0])]++;
+        d2[d2Code(0, queens[0])]++;
         for (int col = 1; col < size; col++)
         {
             queens[col] = 0;
@@ -173,7 +210,6 @@ public:
             if (tmpCs > maxCs)
             {
                 maxCs = tmpCs;
-                // maxCsCol = col;
             }
         }
         int counter = 0;
@@ -190,7 +226,7 @@ public:
         }
         int numberOfColCandidates = counter + 1;
         maxCsCol = random_element(numberOfColCandidates);
-        
+
         return maxCsCol;
     }
     /* #endregion */
