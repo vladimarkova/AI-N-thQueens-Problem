@@ -5,7 +5,8 @@ using namespace std;
 int main()
 {
 
-    play();
+    // play();
+    srand(time(0));
 
     return 0;
 }
