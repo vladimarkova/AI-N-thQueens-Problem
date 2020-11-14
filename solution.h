@@ -12,6 +12,7 @@ int r[10000];
 int d1[19999];
 int d2[19999];
 
+int conflicts[10000];
 int candidates[10000];
 /* #endregion */
 
@@ -49,7 +50,7 @@ void d1CsInit()
     int d1Size = 2 * size - 1;
     for (int i = 0; i < d1Size; i++)
     {
-        int diff = i - size + 1; // x - y = index - size +1 
+        int diff = i - size + 1; // x - y = index - size +1
         d1[i] = 0;
     }
 }
@@ -74,6 +75,69 @@ public:
     }
     /* #endregion */
 
+    /* #region CurrentConflicts */
+    // x stands for col, y for row
+    int getCurrentConflicts(int x, int y)
+    {
+        int conflicts = 0;
+        int index1 = d1Code(x, y);
+        int index2 = d1Code(x, y);
+        conflicts += r[y] + d1[index1] + d2[index2] - 3;
+
+        return conflicts;
+    }
+
+    /* #endregion */
+
+    /* #region RowOfMinCoflicts */
+    // x stands for col, y for row
+    int getRowMinConflicts(int x)
+    {
+        int minCs = getCurrentConflicts(x, 0);
+        int tmpCs = 0;
+        int minCsRow = 0;
+        conflicts[0] = minCs;
+        for (int row = 1; row < size; row++)
+        {
+            tmpCs = getCurrentConflicts(x, row);
+            conflicts[row] = tmpCs; 
+            if (tmpCs < minCs)
+            {
+                minCs = tmpCs;
+            }
+        }
+        int counter = 0;
+        for (int row = 0; row < size; row++)
+        {
+            if (conflicts[row] == minCs)
+            {
+                if (row != 0)
+                {
+                    counter++;
+                }              
+                candidates[counter] = row;              
+            }
+        }
+        int numberOfCandidates = counter + 1;
+        minCsRow = random_element(numberOfCandidates);
+
+        return minCsRow;
+    }
+    /* #endregion */
+
+    /* #region ReplaceAndUpdate */
+    // x stands for col, y for row
+    void replaceAndUpdate(int x, int y, int newRow)
+    {
+        int index1 = d1Code(x, y);
+        int index2 = d2Code(x, y);
+        queens[x] = newRow;
+        r[y]--;
+        d1[index1]--;
+        d2[index2]--;
+    }
+    /* #endregion */
+
     /* #region Init */
     void init()
     {
@@ -84,12 +148,69 @@ public:
             int conflicts = getCurrentConflicts(col, queens[col]);
             if (conflicts != 0)
             {
-                int min = getRowMinConflicts(col);
-                if (min != queens[col])
+                int minRow = getRowMinConflicts(col);
+                if (minRow != queens[col])
                 {
-                    replaceAndUpdate(col, queens[col], min);
+                    replaceAndUpdate(col, queens[col], minRow);
                 }
             }
+        }
+    }
+    /* #endregion */
+
+    /* #region ColOfMaxConflicts */
+    int getColMaxConflicts()
+    {
+        int max = getCurrentConflicts(0, queens[0]);
+        int tmpCs = 0;
+        int maxCsCol = 0;
+
+        for (int col = 1; col < size; col++)
+        {
+            tmpCs = getCurrentConflicts(col, queens[col]);
+            if (tmpCs > max)
+            {
+                max = tmpCs;
+                maxCsCol = col;
+            }
+        }
+
+        return maxCsCol;
+    }
+    /* #endregion */
+
+    /* #region MinMaxConflictOptimization */
+    bool minMaxConflictOpt()
+    {
+        bool noConflicts = false;
+        int maxCol = getColMaxConflicts();
+        int conflicts = getCurrentConflicts(maxCol, queens[maxCol]);
+        if (conflicts == 0)
+        {
+            noConflicts = true;
+        }
+        else
+        {
+            int minRow = getRowMinConflicts(maxCol);
+            if (minRow != queens[maxCol])
+            {
+                replaceAndUpdate(maxCol, queens[maxCol], minRow);
+            }
+        }
+        return noConflicts;
+    }
+    /* #endregion */
+
+    /* #region Solve */
+    void solve()
+    {
+        init();
+        bool noConflicts = minMaxConflictOpt();
+        int i = 0;
+        while (!noConflicts && i < 2 * size)
+        {
+            noConflicts = minMaxConflictOpt();
+            i++;
         }
     }
     /* #endregion */
@@ -127,106 +248,5 @@ public:
         }
     }
     /* #endregion */
-
-    /* #region CurrentConflicts */
-    // x stands for col, y for row
-    int getCurrentConflicts(int x, int y)
-    {
-        int conflicts = 0;
-        int index1 = d1Code(x, y);
-        int index2 = d1Code(x, y);
-        conflicts += r[y] + d1[index1] + d2[index2] - 3;
-
-        return conflicts;
-    }
-
-    /* #endregion */
-
-    /* #region RowOfMinCoflicts */
-    // x stands for col, y for row
-    int getRowMinConflicts(int x)
-    {
-        int min = getCurrentConflicts(x, 0);
-        int tmpCs = 0;
-        int minCsRow = 0;
-        for (int row = 1; row < size; row++)
-        {
-            tmpCs = getCurrentConflicts(x, row);
-            if (tmpCs < min)
-            {
-                min = tmpCs;
-                minCsRow = row;
-            }
-        }
-        return minCsRow;
-    }
-    /* #endregion */
-
-    /* #region ReplaceAndUpdate */
-    // x stands for col, y for row
-    void replaceAndUpdate(int x, int y, int newRow)
-    {
-        int index1 = d1Code(x, y);
-        int index2 = d2Code(x, y);
-        queens[x] = newRow;
-        r[y]--;
-        d1[index1]--;
-        d2[index2]--;
-    }
-    /* #endregion */
-
-    /* #region ColOfMaxConflicts */
-    int getColMaxConflicts()
-    {
-        int max = getCurrentConflicts(0, queens[0]);
-        int tmpCs = 0;
-        int maxCsCol = 0;
-
-        for (int col = 1; col < size; col++)
-        {
-            tmpCs = getCurrentConflicts(col, queens[col]);
-            if (tmpCs > max)
-            {
-                max = tmpCs;
-                maxCsCol = col;
-            }
-        }
-
-        return maxCsCol;
-    }
-    /* #endregion */
-
-    bool minMaxConflictOpt()
-    {
-        bool noConflicts = false;
-        int maxCol = getColMaxConflicts();
-        int conflicts = getCurrentConflicts(maxCol, queens[maxCol]);
-        if (conflicts == 0)
-        {
-            noConflicts = true;
-        }
-        else
-        {
-            int minRow = getRowMinConflicts(maxCol);
-            if (minRow != queens[maxCol])
-            {
-                replaceAndUpdate(maxCol, queens[maxCol], minRow);
-            }
-        }
-        return noConflicts;
-    }
-
-    void solve()
-    {
-        init();
-        bool noConflicts = minMaxConflictOpt();
-        int i = 0;
-        while (!noConflicts && i < 2 * size)
-        {
-            noConflicts = minMaxConflictOpt();
-            i++;
-        }
-    }
-
 };
 /* #endregion */
