@@ -118,8 +118,8 @@ public:
                 candidates[counter] = row;              
             }
         }
-        int numberOfCandidates = counter + 1;
-        minCsRow = random_element(numberOfCandidates);
+        int numberOfRowCandidates = counter + 1;
+        minCsRow = random_element(numberOfRowCandidates);
 
         return minCsRow;
     }
@@ -161,20 +161,36 @@ public:
     /* #region ColOfMaxConflicts */
     int getColMaxConflicts()
     {
-        int max = getCurrentConflicts(0, queens[0]);
+        int maxCs = getCurrentConflicts(0, queens[0]);
         int tmpCs = 0;
         int maxCsCol = 0;
 
+        conflicts[0] = maxCs;
         for (int col = 1; col < size; col++)
         {
             tmpCs = getCurrentConflicts(col, queens[col]);
-            if (tmpCs > max)
+            conflicts[col] = tmpCs;
+            if (tmpCs > maxCs)
             {
-                max = tmpCs;
-                maxCsCol = col;
+                maxCs = tmpCs;
+                // maxCsCol = col;
             }
         }
-
+        int counter = 0;
+        for (int col = 0; col < size; col++)
+        {
+            if (conflicts[col] == maxCs)
+            {
+                if (col != 0)
+                {
+                    counter++;
+                }
+                candidates[counter] = col;
+            }          
+        }
+        int numberOfColCandidates = counter + 1;
+        maxCsCol = random_element(numberOfColCandidates);
+        
         return maxCsCol;
     }
     /* #endregion */
