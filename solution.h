@@ -8,9 +8,9 @@ using namespace std;
 int size;
 int queens[10000];
 
-int row_conflicts[10000];
-int d1_conflcits[19999];
-int d2_conflcits[19999];
+int r[10000];
+int d1[19999];
+int d2[19999];
 
 int candidates[10000];
 /* #endregion */
@@ -29,6 +29,29 @@ int d1Code(int x, int y)
 int d2Code(int x, int y)
 {
     return (x + y);
+}
+
+void rowCsInit()
+{
+    for (int i = 0; i < size; i++)
+    {
+        r[i] = 0;
+    }
+
+    for (int col = 0; col < size; col++)
+    {
+        r[queens[col]]++;
+    }
+}
+
+void d1CsInit()
+{
+    int d1Size = 2 * size - 1;
+    for (int i = 0; i < d1Size; i++)
+    {
+        int diff = i - size + 1; // x - y = index - size +1 
+        d1[i] = 0;
+    }
 }
 /* #endregion */
 
@@ -52,23 +75,23 @@ public:
     /* #endregion */
 
     /* #region Init */
-    // void init()
-    // {
-    //     queens[0] = rand() % size;
-    //     for (int col = 1; col < size; col++)
-    //     {
-    //         queens[col] = 0;
-    //         int conflicts = getCurrentCnflicts(col, queens[col]);
-    //         if (conflicts != 0)
-    //         {
-    //             int min = getRowMinConflicts(col);
-    //             if (min != queens[col])
-    //             {
-    //                 replace(col, queens[col], min);
-    //             }
-    //         }
-    //     }
-    // }
+    void init()
+    {
+        queens[0] = rand() % size;
+        for (int col = 1; col < size; col++)
+        {
+            queens[col] = 0;
+            int conflicts = getCurrentConflicts(col, queens[col]);
+            if (conflicts != 0)
+            {
+                int min = getRowMinConflicts(col);
+                if (min != queens[col])
+                {
+                    replaceAndUpdate(col, queens[col], min);
+                }
+            }
+        }
+    }
     /* #endregion */
 
     /* #region Print */
@@ -112,7 +135,7 @@ public:
         int conflicts = 0;
         int index1 = d1Code(x, y);
         int index2 = d1Code(x, y);
-        conflicts += r[y] + d1[index1] + d2[index2];
+        conflicts += r[y] + d1[index1] + d2[index2] - 3;
 
         return conflicts;
     }
@@ -139,9 +162,9 @@ public:
     }
     /* #endregion */
 
-    /* #region Replace */
+    /* #region ReplaceAndUpdate */
     // x stands for col, y for row
-    void replace(int x, int y, int newRow)
+    void replaceAndUpdate(int x, int y, int newRow)
     {
         int index1 = d1Code(x, y);
         int index2 = d2Code(x, y);
@@ -172,5 +195,38 @@ public:
         return maxCsCol;
     }
     /* #endregion */
+
+    bool minMaxConflictOpt()
+    {
+        bool noConflicts = false;
+        int maxCol = getColMaxConflicts();
+        int conflicts = getCurrentConflicts(maxCol, queens[maxCol]);
+        if (conflicts == 0)
+        {
+            noConflicts = true;
+        }
+        else
+        {
+            int minRow = getRowMinConflicts(maxCol);
+            if (minRow != queens[maxCol])
+            {
+                replaceAndUpdate(maxCol, queens[maxCol], minRow);
+            }
+        }
+        return noConflicts;
+    }
+
+    void solve()
+    {
+        init();
+        bool noConflicts = minMaxConflictOpt();
+        int i = 0;
+        while (!noConflicts && i < 2 * size)
+        {
+            noConflicts = minMaxConflictOpt();
+            i++;
+        }
+    }
+
 };
 /* #endregion */
