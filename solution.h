@@ -33,10 +33,10 @@ int d2Code(int x, int y)
 }
 
 // r[queens[col]]++;
-// // index = x - y + size - 1 
-// d1[d1Code(col, queens[col])]++; 
-// // index = x + y   
-// d2[d2Code(col, queens[col])]++;  
+// // index = x - y + size - 1
+// d1[d1Code(col, queens[col])]++;
+// // index = x + y
+// d2[d2Code(col, queens[col])]++;
 
 void rowCsInit()
 {
@@ -94,6 +94,17 @@ public:
     }
     /* #endregion */
 
+    /* #region Initial Update for r, d1,d2 */
+    void initialUpdate(int col)
+    {
+        int index1 = d1Code(col, queens[col]);
+        int index2 = d2Code(col, queens[col]);
+        r[queens[col]]++;
+        d1[index1]++;
+        d2[index2]++;
+    }
+    /* #endregion */
+
     /* #region CurrentConflicts */
     // x stands for col, y for row
     // +1, if we have no queen?
@@ -116,13 +127,14 @@ public:
 
         return conflicts;
     }
-    
+
     /* #endregion */
 
     /* #region RowOfMinCoflicts */
     // x stands for col, y for row
     int getRowMinConflicts(int x)
     {
+        int currRow = queens[x];
         int minCs = getCurrentConflicts(x, 0);
         int tmpCs = 0;
         int minCsRow = 0;
@@ -130,7 +142,11 @@ public:
         for (int row = 1; row < size; row++)
         {
             tmpCs = getCurrentConflicts(x, row);
-            conflicts[row] = tmpCs; 
+            if (row == currRow)
+            {
+                tmpCs -= 3; 
+            }
+            conflicts[row] = tmpCs;
             if (tmpCs < minCs)
             {
                 minCs = tmpCs;
@@ -144,8 +160,8 @@ public:
                 if (row != 0)
                 {
                     counter++;
-                }              
-                candidates[counter] = row;              
+                }
+                candidates[counter] = row;
             }
         }
         int numberOfRowCandidates = counter + 1;
@@ -177,12 +193,11 @@ public:
     void init()
     {
         queens[0] = rand() % size;
-        r[queens[0]]++;
-        d1[d1Code(0, queens[0])]++;
-        d2[d2Code(0, queens[0])]++;
+        initialUpdate(0);
         for (int col = 1; col < size; col++)
         {
             queens[col] = 0;
+            initialUpdate(col);
             int conflicts = getCurrentConflicts(col, queens[col]);
             if (conflicts != 0)
             {
@@ -223,7 +238,7 @@ public:
                     counter++;
                 }
                 candidates[counter] = col;
-            }          
+            }
         }
         int numberOfColCandidates = counter + 1;
         maxCsCol = random_element(numberOfColCandidates);
@@ -256,7 +271,7 @@ public:
 
     /* #region Solve */
     void solve()
-    {   
+    {
         conflictsInit();
         init();
         bool noConflicts = minMaxConflictOpt();
