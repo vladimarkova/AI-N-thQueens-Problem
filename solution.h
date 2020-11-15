@@ -261,6 +261,7 @@ public:
         else
         {
             int minRow = getRowMinConflicts(maxCol);
+            // is it true?
             if (minRow != queens[maxCol])
             {
                 replaceAndUpdate(maxCol, queens[maxCol], minRow);
