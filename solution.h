@@ -32,16 +32,17 @@ int d2Code(int x, int y)
     return (x + y);
 }
 
+// r[queens[col]]++;
+// // index = x - y + size - 1 
+// d1[d1Code(col, queens[col])]++; 
+// // index = x + y   
+// d2[d2Code(col, queens[col])]++;  
+
 void rowCsInit()
 {
     for (int i = 0; i < size; i++)
     {
         r[i] = 0;
-    }
-
-    for (int col = 0; col < size; col++)
-    {
-        r[queens[col]]++;
     }
 }
 
@@ -53,12 +54,6 @@ void d1CsInit()
     {
         d1[i] = 0;
     }
-
-    // index = x - y + size - 1    
-    for (int col = 0; col < size; col++)
-    {
-        d1[d1Code(col, queens[col])]++;
-    }
 }
 
 void d2CsInit()
@@ -69,12 +64,13 @@ void d2CsInit()
     {
         d2[i] = 0;
     }
+}
 
-    // index = x + y   
-    for (int col = 0; col < size; col++)
-    {
-        d2[d2Code(col, queens[col])]++;
-    }
+void conflictsInit()
+{
+    rowCsInit();
+    d1CsInit();
+    d2CsInit();
 }
 
 /* #endregion */
@@ -163,12 +159,17 @@ public:
     // x stands for col, y for row
     void replaceAndUpdate(int x, int y, int newRow)
     {
-        int index1 = d1Code(x, y);
-        int index2 = d2Code(x, y);
+        int oldIndex1 = d1Code(x, y);
+        int oldIndex2 = d2Code(x, y);
+        int newIndex1 = d1Code(x, newRow);
+        int newIndex2 = d2Code(x, newRow);
         queens[x] = newRow;
         r[y]--;
-        d1[index1]--;
-        d2[index2]--;
+        d1[oldIndex1]--;
+        d2[oldIndex2]--;
+        r[newRow]++;
+        d1[newIndex1]++;
+        d2[newIndex2]++;
     }
     /* #endregion */
 
@@ -255,7 +256,8 @@ public:
 
     /* #region Solve */
     void solve()
-    {
+    {   
+        conflictsInit();
         init();
         bool noConflicts = minMaxConflictOpt();
         int i = 0;
