@@ -141,7 +141,7 @@ public:
         conflicts[0] = minCs;
         for (int row = 1; row < size; row++)
         {
-            tmpCs = getCurrentConflicts(x, row);
+            tmpCs = getCurrentConflicts(x, row) + 3;
             if (row == currRow)
             {
                 tmpCs -= 3; 
@@ -202,6 +202,7 @@ public:
             if (conflicts != 0)
             {
                 int minRow = getRowMinConflicts(col);
+                // is it true?
                 if (minRow != queens[col])
                 {
                     replaceAndUpdate(col, queens[col], minRow);
@@ -294,15 +295,12 @@ public:
             int counter = 0;
             while (counter < queens[i])
             {
-                // cout << '-' << endl;
                 matrix[i][counter] = '-';
                 counter++;
             }
-            // cout << '*' << endl;
             matrix[i][counter] = '*';
             while (counter < size - 1)
             {
-                // cout << '-' << endl;
                 counter++;
                 matrix[i][counter] = '-';
             }
@@ -315,6 +313,7 @@ public:
             }
             cout << endl;
         }
+        cout << endl;
     }
     /* #endregion */
 };

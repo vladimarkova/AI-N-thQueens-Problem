@@ -22,7 +22,7 @@ void play()
 
         solution.print(); 
 
-        cout << "Enter 0 to stop the game or 1 to continue" << endl;
+        cout << "Enter 0 to stop the game or 1 to continue" << endl << endl;
         cin >> response;
     }
 }
