@@ -3,17 +3,22 @@
 #include <cstdlib>
 using namespace std;
 
+/* #region Constants */
+const int MAX_NUMBER_OF_QUEENS = 10000;
+const int MAX_NUMBER_OF_DIAGONALS = (2 * MAX_NUMBER_OF_QUEENS) - 1; 
+/* #endregion */
+
 /* #region Variables */
 // size-up to 10 000, queens[5]=3 <=> in matrix-queen on fifth column is on third row
 int size;
-int queens[10000];
+int queens[MAX_NUMBER_OF_QUEENS];
 
-int r[10000];
-int d1[19999];
-int d2[19999];
+int r[MAX_NUMBER_OF_QUEENS];
+int d1[MAX_NUMBER_OF_DIAGONALS];
+int d2[MAX_NUMBER_OF_DIAGONALS];
 
-int conflicts[10000];
-int candidates[10000];
+int conflicts[MAX_NUMBER_OF_QUEENS];
+int candidates[MAX_NUMBER_OF_QUEENS];
 /* #endregion */
 
 /* #region Helpers */
@@ -112,7 +117,7 @@ public:
     {
         int conflicts = 0;
         int index1 = d1Code(x, y);
-        int index2 = d1Code(x, y);
+        int index2 = d2Code(x, y);
         conflicts += r[y] + d1[index1] + d2[index2] - 3;
 
         return conflicts;
@@ -122,7 +127,7 @@ public:
     {
         int conflicts = 0;
         int index1 = d1Code(x, y);
-        int index2 = d1Code(x, y);
+        int index2 = d2Code(x, y);
         conflicts += r[y] + d1[index1] + d2[index2];
 
         return conflicts;
@@ -315,6 +320,38 @@ public:
             cout << endl;
         }
         cout << endl;
+    }
+    /* #endregion */
+
+    /* #region Isolated Tests */
+    void printCsArrays() {
+        cout << "R" << endl;
+        for (int i = 0; i < MAX_NUMBER_OF_QUEENS / 1000; i++) {
+            cout << r[i] << " ";
+        }
+        cout << endl;
+
+        cout << "D1" << endl;
+        for (int i = 0; i < MAX_NUMBER_OF_QUEENS / 1000; i++) {
+            cout << d1[i] << " ";
+        }
+        cout << endl;
+
+        cout << "D2" << endl;
+        for (int i = 0; i < MAX_NUMBER_OF_QUEENS / 1000; i++) {
+            cout << d2[i] << " ";
+        }
+        cout << endl;
+    }
+
+    void isolatedTests() {
+        cout << "Q[0] " << queens[0] << " Q[1] " << queens[1] << " Q[2] " << queens[2] << endl; 
+        size = 4;
+        conflictsInit();
+        initialUpdate(0);
+        initialUpdate(1);
+        initialUpdate(2);
+        printCsArrays();
     }
     /* #endregion */
 };
