@@ -7,6 +7,7 @@ using namespace std;
 const int MAX_NUMBER_OF_QUEENS = 10000;
 const int MAX_NUMBER_OF_DIAGONALS = (2 * MAX_NUMBER_OF_QUEENS) - 1; 
 const int INF = 100000000; 
+const int MAX_PRINTING_SIZE = 50;  
 /* #endregion */
 
 /* #region Variables */
@@ -20,6 +21,8 @@ int d2[MAX_NUMBER_OF_DIAGONALS];
 
 int conflicts[MAX_NUMBER_OF_QUEENS];
 int candidates[MAX_NUMBER_OF_QUEENS];
+
+int MAX_ITERATIONS = 2 * size;
 /* #endregion */
 
 /* #region Helpers */
@@ -276,7 +279,7 @@ public:
         init();
         bool noConflicts = minMaxConflictOpt();
         int i = 0;
-        while (!noConflicts && i < 2 * size)
+        while (!noConflicts && i < MAX_ITERATIONS)
         {
             noConflicts = minMaxConflictOpt();
             i++;
@@ -288,20 +291,20 @@ public:
 
     void print()
     {
-        char matrix[50][50];
+        char matrix[MAX_PRINTING_SIZE][MAX_PRINTING_SIZE]; 
         for (int i = 0; i < size; i++)
         {
             int counter = 0;
             while (counter < queens[i])
             {
-                matrix[i][counter] = '-';
+                matrix[counter][i] = '-';
                 counter++;
             }
-            matrix[i][counter] = '*';
+            matrix[counter][i] = '*';
             while (counter < size - 1)
             {
                 counter++;
-                matrix[i][counter] = '-';
+                matrix[counter][i] = '-';
             }
         }
         for (int i = 0; i < size; i++)
@@ -314,7 +317,7 @@ public:
         }
         cout << endl;
     }
-    /* #endregion */
+/* #endregion */
 
     /* #region Isolated Tests */
     void printCsArrays() {
@@ -338,8 +341,16 @@ public:
     }
 
     void isolatedTests() {
+        conflictsInit();
         init();
-        cout << getColMaxConflicts() << endl;
+        // int maxCol = getColMaxConflicts();
+        // cout << "Col of max cs: " << maxCol << endl;
+        // cout << "Current cs in max col: " << getCurrentConflicts(maxCol,queens[maxCol]) << endl; 
+        // bool cs = minMaxConflictOpt();
+        // maxCol = getColMaxConflicts();
+        // cout << "Current cs in max col: " << getCurrentConflicts(maxCol,queens[maxCol]) << endl; 
+        // cout << "Are there conflicts in the board? " << cs << endl << endl;
+        // cout << queens[0] << " " << queens[1] << " " << queens[2] << " " << queens[3] << endl << endl; 
         // printCsArrays();
     }
     /* #endregion */
