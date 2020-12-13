@@ -11,7 +11,7 @@ void play()
     while (response != '0')
     {
         Solution solution;
-        // solution.read();
+        solution.read();
         using namespace std::chrono;
         high_resolution_clock::time_point t1 = high_resolution_clock::now();   
 

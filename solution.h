@@ -6,6 +6,7 @@ using namespace std;
 /* #region Constants */
 const int MAX_NUMBER_OF_QUEENS = 10000;
 const int MAX_NUMBER_OF_DIAGONALS = (2 * MAX_NUMBER_OF_QUEENS) - 1; 
+const int INF = 100000000; 
 /* #endregion */
 
 /* #region Variables */
@@ -139,17 +140,17 @@ public:
     // x stands for col, y for row
     int getRowMinConflicts(int x)
     {
-        int currRow = queens[x];
-        int minCs = getCurrentConflicts(x, 0);
+        int startRow = queens[x];
+        int minCs = INF;
         int tmpCs = 0;
-        int minCsRow = 0;
-        conflicts[0] = minCs;
-        for (int row = 1; row < size; row++)
+        int minCsRow = startRow;
+        for (int row = 0; row < size; row++)
         {
-            tmpCs = getCurrentConflicts(x, row) + 3;
-            if (row == currRow)
-            {
-                tmpCs -= 3; 
+            if (row != startRow) {
+                tmpCs = getCurrentConflicts(x, row) + 3;
+            } 
+            else {
+                tmpCs = getCurrentConflicts(x, row);
             }
             conflicts[row] = tmpCs;
             if (tmpCs < minCs)
@@ -162,14 +163,11 @@ public:
         {
             if (conflicts[row] == minCs)
             {
-                if (row != 0)
-                {
-                    counter++;
-                }
                 candidates[counter] = row;
+                counter++;
             }
         }
-        int numberOfRowCandidates = counter + 1;
+        int numberOfRowCandidates = counter;
         minCsRow = random_element(numberOfRowCandidates);
 
         return minCsRow;
@@ -197,22 +195,21 @@ public:
     /* #region Init */
     void init()
     {
-        queens[0] = rand() % size;
-        initialUpdate(0);
-        for (int col = 1; col < size; col++)
+        for (int col = 0; col < size; col++)
         {
-            queens[col] = 0;
+            queens[col] = rand() % size;
             initialUpdate(col);
+            cout << col << ": " << queens[col] << endl;
             int conflicts = getCurrentConflicts(col, queens[col]);
             if (conflicts != 0)
             {
                 int minRow = getRowMinConflicts(col);
-                // is it true?
                 if (minRow != queens[col])
                 {
                     replaceAndUpdate(col, queens[col], minRow);
                 }
             }
+            cout << col << " newRow: " << queens[col] << endl;
         }
     }
     /* #endregion */
@@ -220,12 +217,11 @@ public:
     /* #region ColOfMaxConflicts */
     int getColMaxConflicts()
     {
-        int maxCs = getCurrentConflicts(0, queens[0]);
+        int maxCs = -INF;
         int tmpCs = 0;
         int maxCsCol = 0;
 
-        conflicts[0] = maxCs;
-        for (int col = 1; col < size; col++)
+        for (int col = 0; col < size; col++) 
         {
             tmpCs = getCurrentConflicts(col, queens[col]);
             conflicts[col] = tmpCs;
@@ -239,14 +235,11 @@ public:
         {
             if (conflicts[col] == maxCs)
             {
-                if (col != 0)
-                {
-                    counter++;
-                }
                 candidates[counter] = col;
+                counter++;
             }
         }
-        int numberOfColCandidates = counter + 1;
+        int numberOfColCandidates = counter;
         maxCsCol = random_element(numberOfColCandidates);
 
         return maxCsCol;
@@ -345,13 +338,9 @@ public:
     }
 
     void isolatedTests() {
-        cout << "Q[0] " << queens[0] << " Q[1] " << queens[1] << " Q[2] " << queens[2] << endl; 
-        size = 4;
-        conflictsInit();
-        initialUpdate(0);
-        initialUpdate(1);
-        initialUpdate(2);
-        printCsArrays();
+        init();
+        cout << getColMaxConflicts() << endl;
+        // printCsArrays();
     }
     /* #endregion */
 };
