@@ -8,6 +8,7 @@ const int MAX_NUMBER_OF_QUEENS = 10000;
 const int MAX_NUMBER_OF_DIAGONALS = (2 * MAX_NUMBER_OF_QUEENS) - 1; 
 const int INF = 100000000; 
 const int MAX_PRINTING_SIZE = 50;  
+const int K = 100;
 /* #endregion */
 
 /* #region Variables */
@@ -90,13 +91,15 @@ class Solution
 {
 public:
     /* #region Read */
-    void read()
+    void read(int& n)
     {
-        int n;
         cout << "Enter number of queens: " << endl;
         cin >> n;
         while (n == 2 || n == 3)
         {
+            if (n < 2 || n > 3) {
+                n = 2;
+            }
             cout << "This problem does not have a solution. Please try with another input: " << endl;
             cin >> n;
         }
@@ -191,9 +194,11 @@ public:
         int numberOfRowCandidates = counter;
         minCsRow = random_element(numberOfRowCandidates);
 
-        if (minCs == startConflicts) {
-            minCsRow = startRow;
-        }
+        // if min value of conflicts is equal to conflicts in our start row,
+        // should we update(potentially) the row (randomize again)?           
+        // if (minCs == startConflicts) {
+        //     minCsRow = startRow;
+        // }
 
         return minCsRow;
     }
@@ -220,13 +225,14 @@ public:
     /* #region Init */
     void init()
     {
+        cout << endl << "INIT STARTED!" << endl << endl;  
         for (int col = 0; col < size; col++)
         {
             queens[col] = rand() % size;
             initialUpdate(col);
-            cout << col << ": " << queens[col] << endl;
+            // cout << col << ": " << queens[col] << endl;
             int conflicts = getCurrentConflicts(col, queens[col]);
-            cout << "firstCs: " << conflicts << endl;
+            // cout << "firstCs: " << conflicts << endl;
             if (conflicts != 0)
             {
                 int minRow = getRowMinConflicts(col);
@@ -235,9 +241,9 @@ public:
                     replaceAndUpdate(col, queens[col], minRow);
                 }
             }
-            cout << col << " newRow: " << queens[col] << endl;
-            conflicts = getCurrentConflicts(col, queens[col]);
-            cout << "secondCs: " << conflicts << endl;
+            // cout << col << " newRow: " << queens[col] << endl;
+            // conflicts = getCurrentConflicts(col, queens[col]);
+            // cout << "secondCs: " << conflicts << endl;
         }
     }
     /* #endregion */
@@ -279,9 +285,9 @@ public:
     {
         bool noConflicts = false;
         int maxCol = getColMaxConflicts();
-        cout << "Col of max cs: " << maxCol << endl;
+        // out << "Col of max cs: " << maxCol << endl;
         int conflicts = getCurrentConflicts(maxCol, queens[maxCol]);
-        cout << "Cs in maxCol: " << conflicts << endl;
+        // cout << "Cs in maxCol: " << conflicts << endl;
         if (conflicts == 0)
         {
             cout << "NO CONFLICTS!" << endl << endl;
@@ -289,21 +295,21 @@ public:
         }
         else
         {
-            cout << "INTERESTING PART, REPLACEMENTS AND UPDATES STARTED!" << endl << endl;
+            // cout << "INTERESTING PART, REPLACEMENTS AND UPDATES STARTED!" << endl << endl;
             int minRow = getRowMinConflicts(maxCol);
-            cout << "Min Row discovered: " << minRow << endl << endl;
+            // cout << "Min Row discovered: " << minRow << endl << endl;
             // is it true?
             if (minRow != queens[maxCol])
             {
-                cout << "Min Row different from our row!" << endl << endl; 
-                cout << "old position: " << queens[maxCol] << endl;
+                // cout << "Min Row different from our row!" << endl << endl; 
+                // cout << "old position: " << queens[maxCol] << endl;
                 replaceAndUpdate(maxCol, queens[maxCol], minRow);
-                cout << "new position: " << queens[maxCol] << endl; 
+                // cout << "new position: " << queens[maxCol] << endl; 
             }
             conflicts = getCurrentConflicts(maxCol, queens[maxCol]);  
-            cout << "Conflicts in maxCol after replace and update (potentional): " << conflicts << endl << endl;      
+            // cout << "Conflicts in maxCol after replace and update (potentional): " << conflicts << endl << endl;      
         }
-        cout << "d2[what we need] = " << d2[d2Code(maxCol, queens[maxCol])] << endl << endl;
+        // cout << "d2[what we need] = " << d2[d2Code(maxCol, queens[maxCol])] << endl << endl;
         return noConflicts;
     }
     /* #endregion */
@@ -314,13 +320,23 @@ public:
         conflictsInit();
         init();
         bool noConflicts = minMaxConflictOpt();
+        cout << "Without conflicts? " << boolalpha << noConflicts << endl << endl;  
+        cout << "-------------->" << endl << endl;
+        if (noConflicts == true) {
+            return;
+        }
         int i = 0;
-        while (!noConflicts && i < MAX_ITERATIONS)
+        while ((noConflicts != true) && i < K * size)
         {
             noConflicts = minMaxConflictOpt();
             i++;
         }
-    }
+        cout << "Number of iterations: " << i << endl << endl;
+        cout << "Without conflicts? " << boolalpha << noConflicts << endl << endl; 
+        // while (noConflicts != true) {
+        //     solve();
+        // } 
+    } 
     /* #endregion */
 
     /* #region Print */
@@ -377,12 +393,14 @@ public:
     }
 
     void isolatedTests() {
-        conflictsInit();
-        init();
-        print();
-        minMaxConflictOpt();
-        // cout << "All conflicts in board: " << getBoardConflicts() - (size * 3) << endl << endl; 
-        // cout << "d2[6]" << d2[6] << endl << endl;
+        // conflictsInit();
+        // init();
+        // for (int i = 0; i < 100; i++) {
+        //     minMaxConflictOpt();
+        //     print();
+        //     cout << "NEW TRY!" << endl << endl;
+        // }      
+        solve();
     }
     /* #endregion */
 };
