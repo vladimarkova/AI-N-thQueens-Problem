@@ -137,6 +137,17 @@ public:
         return conflicts;
     }
 
+    int getBoardConflicts() {
+        int allConflicts = 0;
+        for (int i = 0; i < MAX_NUMBER_OF_QUEENS; i++) {
+            allConflicts += r[i];
+        }
+        for (int i = 0; i < MAX_NUMBER_OF_DIAGONALS; i++) {
+            allConflicts += d1[i];
+            allConflicts += d2[i];
+        }
+        return allConflicts;
+    }
     /* #endregion */
 
     /* #region RowOfMinCoflicts */
@@ -204,6 +215,7 @@ public:
             initialUpdate(col);
             cout << col << ": " << queens[col] << endl;
             int conflicts = getCurrentConflicts(col, queens[col]);
+            cout << "firstCs: " << conflicts << endl;
             if (conflicts != 0)
             {
                 int minRow = getRowMinConflicts(col);
@@ -213,6 +225,8 @@ public:
                 }
             }
             cout << col << " newRow: " << queens[col] << endl;
+            conflicts = getCurrentConflicts(col, queens[col]);
+            cout << "secondCs: " << conflicts << endl;
         }
     }
     /* #endregion */
@@ -343,15 +357,11 @@ public:
     void isolatedTests() {
         conflictsInit();
         init();
-        // int maxCol = getColMaxConflicts();
-        // cout << "Col of max cs: " << maxCol << endl;
-        // cout << "Current cs in max col: " << getCurrentConflicts(maxCol,queens[maxCol]) << endl; 
-        // bool cs = minMaxConflictOpt();
-        // maxCol = getColMaxConflicts();
-        // cout << "Current cs in max col: " << getCurrentConflicts(maxCol,queens[maxCol]) << endl; 
-        // cout << "Are there conflicts in the board? " << cs << endl << endl;
-        // cout << queens[0] << " " << queens[1] << " " << queens[2] << " " << queens[3] << endl << endl; 
-        // printCsArrays();
+        print();
+        int maxCol = getColMaxConflicts();
+        cout << "Col of max cs: " << maxCol << endl;
+        cout << "Current cs in max col: " << getCurrentConflicts(maxCol,queens[maxCol]) << endl << endl;
+        cout << "All conflicts in board: " << getBoardConflicts() << endl << endl; 
     }
     /* #endregion */
 };
